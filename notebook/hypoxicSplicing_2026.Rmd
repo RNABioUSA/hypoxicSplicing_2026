@@ -1,0 +1,191 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=TRUE}
+# ----------------------------
+# Package Loads
+# ----------------------------
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman", repos = "https://cloud.r-project.org")
+}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager", repos = "https://cloud.r-project.org")
+}
+
+if (!requireNamespace("annotables", quietly = TRUE)) {
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    install.packages("devtools")
+  }
+  devtools::install_github("stephenturner/annotables")
+}
+
+pacman::p_load(here,
+               tximeta,
+               DESeq2,
+               ashr,
+               annotables,
+               openxlsx,
+               BiocParallel,
+               DRIMSeq,
+               stageR,
+               dplyr,
+               factoextra,
+               rbioapi,
+               ontologyIndex,
+               Rsubread,
+               ggnewscale,
+               ggtext,
+               eulerr,
+               ComplexHeatmap,
+               ComplexUpset,
+               ggalluvial
+               )
+
+# ----------------------------
+# Project Setup
+# ----------------------------
+PROJECT_ROOT <- here::here()
+Sys.setenv(PROJECT_ROOT = PROJECT_ROOT)
+
+RESULTS_DIR <- file.path(PROJECT_ROOT, "results")
+Sys.setenv(RESULTS_DIR = RESULTS_DIR)
+dir.create(RESULTS_DIR, showWarnings = FALSE, recursive = TRUE)
+
+
+# ---- Reads + Results ----
+#READS_ROOT  <- file.path(PROJECT_ROOT, "reads")
+
+# ---- Metadata ----
+#SAMPLES_TSV <- file.path(PROJECT_ROOT, "config", "metadata", "samples.tsv")
+
+
+
+message("Project root: ", PROJECT_ROOT)
+
+```
+
+
+```{bash run_analysis, echo=TRUE, include=TRUE}
+
+set -euo pipefail
+set -x
+
+"$PROJECT_ROOT/scripts/run" bash "$PROJECT_ROOT/scripts/analysis/run_salmon.sh"
+"$PROJECT_ROOT/scripts/run" bash "$PROJECT_ROOT/scripts/analysis/run_suppa2.sh"
+"$PROJECT_ROOT/scripts/run" bash "$PROJECT_ROOT/scripts/analysis/run_star.sh"
+```
+
+
+
+
+```{r deseq2}
+source(file.path(PROJECT_ROOT, "scripts/analysis/run_deseq.R"))
+source(file.path(PROJECT_ROOT, "scripts/analysis/run_dexseq.R"))
+source(file.path(PROJECT_ROOT, "scripts/analysis/run_drimseq.R"))
+source(file.path(PROJECT_ROOT, "scripts/analysis/load_suppa.R"))
+
+deseq_results <- run_deseq()
+drimseq_results <- run_drimseq()
+dexseq_results_multiMap_test <- run_dexseq(counting_method = "summarizeOverlaps", 
+                                           include_multimappers = FALSE,
+                                           count_multi_exon_overlaps = TRUE)
+dexseq_results <- run_dexseq()
+suppa_results <- load_suppa()
+
+run_dexseq(counting_method = "HTSeq")
+
+sapply(deseq_results$results$gene_sig_by_tp, nrow)
+sapply(drimseq_results$results$gene_sig_by_tp, nrow)
+sapply(dexseq_results$results$gene_sig_by_tp, nrow)
+sapply(suppa2_results$results$gene_sig_by_tp, nrow)
+```
+
+```{r figure_1}
+source(file.path(PROJECT_ROOT, "scripts/plots/plot_fig_1.R"))
+
+plot_fig_1_all(
+  deseq_results = deseq_results,
+  seed = 333,
+  enrichment_cutoff = 0.10,
+)
+```
+```{r figure_2}
+source(file.path(PROJECT_ROOT, "scripts/plots/plot_figure_2.R"))
+
+plot_figure_2_all(
+  deseq_results = deseq_results,
+  dexseq_results = dexseq_results,
+  drimseq_results = drimseq_results,
+  suppa_results = suppa_results
+)
+```
+
+```{r figure_3}
+source(file.path(PROJECT_ROOT, "scripts/plots/plot_figure_3.R"))
+
+figure_3_gene_vs_transcript_overlap <- run_gene_vs_transcript_overlap_analysis(
+  dexseq_results = dexseq_results,
+  drimseq_results = drimseq_results,
+  suppa_results = suppa_results,
+  deseq_results = deseq_results
+)
+
+plot_gene_vs_transcript_upset(figure_3_gene_vs_transcript_overlap)
+plot_gene_vs_transcript_alluvial(figure_3_gene_vs_transcript_overlap)
+```
+
+```{r figure_4}
+source(file.path(PROJECT_ROOT, "scripts/plots/plot_figure_4.R"))
+
+
+figure_4_splicing_pathway_representation <- run_splicing_pathway_representation_analysis(
+  dexseq_results = dexseq_results,
+  drimseq_results = drimseq_results,
+  suppa_results = suppa_results,
+  deseq_results = deseq_results,
+  save_tables = FALSE,
+  force_mapping = FALSE,
+  force_obo = FALSE,
+  force_term2gene = FALSE
+)
+
+figure_4_splicing_pathway_enrichment <- run_splicing_pathway_enrichment_analysis(
+  dexseq_results = dexseq_results,
+  drimseq_results = drimseq_results,
+  suppa_results = suppa_results,
+  deseq_results = deseq_results,
+  save_tables = FALSE,
+  force_enrich = FALSE
+)
+
+plot_clustered_pathway_representation(figure_4_splicing_pathway_representation)
+plot_splicing_pathway_overlap_across_timepoints(figure_4_splicing_pathway_enrichment)
+plot_splicing_vs_deg_pathway_overlap(figure_4_splicing_pathway_enrichment)
+
+
+
+```
+
+```{r sup_figure_x}
+dexseq_runs_h3 <- .run_dexseq_h3_policy_grid(
+  overwrite = FALSE,
+  load_existing = TRUE
+)
+
+```
+
+```{bash dexseq_supplement echo=TRUE}
+set -euo pipefail
+set -x
+
+"$PROJECT_ROOT/scripts/run" bash "$PROJECT_ROOT/scripts/prep/prep_dexseq_featurecounts.sh"
+```
+
+```{r sup_tables}
+
+source(file.path(PROJECT_ROOT, "scripts/utils/make_sup_tables.R"))
+
+```
+

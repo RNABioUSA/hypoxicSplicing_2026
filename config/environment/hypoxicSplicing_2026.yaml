@@ -1,0 +1,22 @@
+name: hypoxicSplicing
+
+channels:
+  - conda-forge
+  - bioconda
+  - nanoporetech
+  - defaults
+
+dependencies:
+  - python=3.10
+  - samtools
+  - minimap2
+  - bedtools
+  - bcftools
+  - pigz
+  - nanoporetech::modkit
+  - openpyxl
+  - ucsc-gtftogenepred
+  - ucsc-genepredtobed
+  - rseqc
+  - salmon=1.10.2
+  - deeptools

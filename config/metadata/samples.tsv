@@ -1,0 +1,16 @@
+sample_id	condition	replicate	read1_rel	read2_rel	library_layout	strandedness	exclude
+C1_1	C1	1	C1/C1_1/C1_1_1.fq.gz	C1/C1_1/C1_1_2.fq.gz	PE	unstranded	FALSE
+C1_2	C1	2	C1/C1_2/C1_2_1.fq.gz	C1/C1_2/C1_2_2.fq.gz	PE	unstranded	FALSE
+C1_3	C1	3	C1/C1_3/C1_3_1.fq.gz	C1/C1_3/C1_3_2.fq.gz	PE	unstranded	FALSE
+
+H1_1	H1	1	H1/H1_1/H1_1_1.fq.gz	H1/H1_1/H1_1_2.fq.gz	PE	unstranded	FALSE
+H1_2	H1	2	H1/H1_2/H1_2_1.fq.gz	H1/H1_2/H1_2_2.fq.gz	PE	unstranded	FALSE
+H1_3	H1	3	H1/H1_3/H1_3_1.fq.gz	H1/H1_3/H1_3_2.fq.gz	PE	unstranded	FALSE
+
+H3_1	H3	1	H3/H3_1/H3_1_1.fq.gz	H3/H3_1/H3_1_2.fq.gz	PE	unstranded	FALSE
+H3_2	H3	2	H3/H3_2/H3_2_1.fq.gz	H3/H3_2/H3_2_2.fq.gz	PE	unstranded	FALSE
+H3_3	H3	3	H3/H3_3/H3_3_1.fq.gz	H3/H3_3/H3_3_2.fq.gz	PE	unstranded	FALSE
+
+H24_1	H24	1	H24/H24_1/H24_1_1.fq.gz	H24/H24_1/H24_1_2.fq.gz	PE	unstranded	FALSE
+H24_2	H24	2	H24/H24_2/H24_2_1.fq.gz	H24/H24_2/H24_2_2.fq.gz	PE	unstranded	FALSE
+H24_3	H24	3	H24/H24_3/H24_3_1.fq.gz	H24/H24_3/H24_3_2.fq.gz	PE	unstranded	TRUE

@@ -1,0 +1,11 @@
+sample_id	population	individual	gsm	run_accession	stress	time	library_layout	read_length
+Xin_A1_0h	Tibetan	Tibetan-1	GSM4332577	SRR11149193	normoxia	0h	PAIRED	150
+Xin_A2_0h	Tibetan	Tibetan-2	GSM4332582	SRR11149198	normoxia	0h	PAIRED	150
+Xin_A3_0h	Tibetan	Tibetan-3	GSM4332587	SRR11149203	normoxia	0h	PAIRED	150
+Xin_A4_0h	Tibetan	Tibetan-4	GSM4332592	SRR11149208	normoxia	0h	PAIRED	150
+Xin_A5_0h	Tibetan	Tibetan-5	GSM4332597	SRR11149213	normoxia	0h	PAIRED	150
+Xin_W1_0h	Han	Han-1	GSM4332602	SRR11149218	normoxia	0h	PAIRED	150
+Xin_W2_0h	Han	Han-2	GSM4332607	SRR11149223	normoxia	0h	PAIRED	150
+Xin_W3_0h	Han	Han-3	GSM4332612	SRR11149228	normoxia	0h	PAIRED	150
+Xin_W4_0h	Han	Han-4	GSM4332617	SRR11149233	normoxia	0h	PAIRED	150
+Xin_W5_0h	Han	Han-5	GSM4332622	SRR11149238	normoxia	0h	PAIRED	150

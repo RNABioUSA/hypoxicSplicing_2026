@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -----------------------------
+# Configuration
+# -----------------------------
+ENV_NAME="${ENV_NAME:-suppa2}"
+DEBUG="${DEBUG:-0}"
+
+log() {
+  echo "[run] $*" >&2
+}
+
+die() {
+  echo "[run:ERROR] $*" >&2
+  exit 1
+}
+
+# -----------------------------
+# Locate conda executable
+# -----------------------------
+if [ -n "${CONDA_EXE:-}" ] && [ -x "${CONDA_EXE:-}" ]; then
+  CONDA="${CONDA_EXE}"
+
+elif command -v conda >/dev/null 2>&1; then
+  CONDA="$(command -v conda)"
+
+else
+  # Search $HOME for */bin/conda (handles Miniconda3, miniforge3, etc.)
+  CONDA="$(find "$HOME" -maxdepth 3 -type f -name conda -path "*/bin/conda" 2>/dev/null | head -n 1 || true)"
+fi
+
+[ -n "${CONDA:-}" ] && [ -x "${CONDA:-}" ] ||
+  die "conda not found (checked CONDA_EXE, PATH, and searched \$HOME)."
+
+# -----------------------------
+# Prefer mamba if available
+# -----------------------------
+if "$CONDA" run -n "$ENV_NAME" command -v mamba >/dev/null 2>&1; then
+  RUNNER="$CONDA run -n $ENV_NAME --no-capture-output"
+else
+  RUNNER="$CONDA run -n $ENV_NAME --no-capture-output"
+fi
+
+# (Note: mamba doesn't replace 'conda run', so we still use conda run.
+# This block is future-proof if you later extend functionality.)
+
+# -----------------------------
+# Debug output
+# -----------------------------
+if [ "$DEBUG" = "1" ]; then
+  log "Using conda: $CONDA"
+  log "Environment: $ENV_NAME"
+  log "PATH: $PATH"
+  log "Executing: $*"
+fi
+
+# -----------------------------
+# Execute command inside env
+# -----------------------------
+exec "$CONDA" run -n "$ENV_NAME" --no-capture-output "$@"
